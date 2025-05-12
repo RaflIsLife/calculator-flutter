@@ -34,6 +34,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String number = '';
   String tempNumber = '';
+  String pressedNumber = '';
   String finalNumber = '';
 
   calculating() {
@@ -62,13 +63,50 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  addNumber(tempNumber) {
-    number += tempNumber;
-    if (number.startsWith("/") ||
-        number.startsWith("x") ||
-        number.startsWith("+")) {
-      number = '';
+  addNumber(pressedNumber) {
+    if (number.isEmpty || number == '-') {
+      if (number == '-' && pressedNumber == '-') {
+      } else if (pressedNumber != '/' &&
+          pressedNumber != 'x' &&
+          pressedNumber != '+') {
+        number += pressedNumber;
+        print('masuk ke sini 1');
+      } else {
+        number = '';
+        print('masuk ke sini 2');
+      }
+      //validasi operator agar tidak numpuk
+    } else if ((number.endsWith("/") || number.endsWith("x")) &&
+        pressedNumber == "-") {
+      number += pressedNumber;
+      print('masuk ke sini 3');
+    } else if ((number.endsWith("/") ||
+            number.endsWith("x") ||
+            number.endsWith("+") ||
+            number.endsWith("-")) &&
+        number != "-") {
+      if (number.endsWith("-") &&
+          (pressedNumber == "/" ||
+              pressedNumber == "x" ||
+              pressedNumber == "+")) {
+        // Tidak mengganti "-" dengan operator lain
+        print('Operator tidak valid setelah "-"');
+      } else if (pressedNumber == "/" ||
+          pressedNumber == "x" ||
+          pressedNumber == "+" ||
+          pressedNumber == "-") {
+        number = number.substring(0, number.length - 1);
+        number += pressedNumber;
+        print('masuk ke sini 4');
+      } else {
+        number += pressedNumber;
+        print('masuk ke sini 5');
+      }
+    } else {
+      number += pressedNumber;
+      print('masuk ke sini 6');
     }
+
     setState(() {
       number;
     });
@@ -87,16 +125,23 @@ class _MyHomePageState extends State<MyHomePage> {
   removeAllNumber() {
     setState(() {
       number = '';
-      tempNumber = '';
+      pressedNumber = '';
       finalNumber = '';
     });
   }
 
   removeOneNumber() {
-    if (number.length != 0) {
+    if (number.isNotEmpty) {
       setState(() {
         number = number.substring(0, number.length - 1);
-        finalNumber = calculating();
+        if (number.contains('/') ||
+            number.contains('x') ||
+            number.contains('+') ||
+            number.contains('-')) {
+          finalNumber = calculating();
+        } else {
+          finalNumber = '';
+        }
       });
     }
   }
